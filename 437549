@@ -1,0 +1,99 @@
+<!DOCTYPE html><html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bigo-store - Loja de E-books</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        .admin { display: none; }
+        .ebook { border: 1px solid #ddd; padding: 10px; margin: 10px; display: inline-block; }
+        .cart { position: fixed; top: 10px; right: 10px; background: #f4f4f4; padding: 10px; border: 1px solid #ccc; }
+        .admin-panel { background: #f8f8f8; padding: 10px; margin-top: 20px; }
+    </style>
+    <script>
+        const adminEmail = "jersondesouzasouza77@gmail.com";
+        let ebooks = [];
+        let cart = [];function verificarAcesso() {
+        const email = prompt("Digite seu e-mail para acessar:");
+        
+        if (email === adminEmail) {
+            document.getElementById("admin-section").style.display = "block";
+            document.getElementById("comprador-section").style.display = "none";
+        } else {
+            document.getElementById("admin-section").style.display = "none";
+            document.getElementById("comprador-section").style.display = "block";
+            listarEbooks();
+        }
+    }
+    
+    function listarEbooks() {
+        let container = document.getElementById("ebooks-list");
+        container.innerHTML = "";
+        ebooks.forEach(ebook => {
+            let div = document.createElement("div");
+            div.className = "ebook";
+            div.innerHTML = `<h3>${ebook.title}</h3><p>${ebook.description}</p><p>Tags: ${ebook.tags.join(", ")}</p><p>R$ ${ebook.price.toFixed(2)}</p><a href='${ebook.file}' target='_blank'>Visualizar PDF</a><br><button onclick='adicionarAoCarrinho(${ebook.id})'>Comprar</button>`;
+            container.appendChild(div);
+        });
+    }
+    
+    function adicionarAoCarrinho(id) {
+        let ebook = ebooks.find(e => e.id === id);
+        cart.push(ebook);
+        atualizarCarrinho();
+    }
+    
+    function atualizarCarrinho() {
+        let cartContainer = document.getElementById("cart");
+        cartContainer.innerHTML = "<h4>Carrinho</h4>";
+        cart.forEach(item => {
+            let p = document.createElement("p");
+            p.innerText = `${item.title} - R$ ${item.price.toFixed(2)}`;
+            cartContainer.appendChild(p);
+        });
+        let checkoutBtn = document.createElement("button");
+        checkoutBtn.innerText = "Finalizar Compra";
+        checkoutBtn.onclick = finalizarCompra;
+        cartContainer.appendChild(checkoutBtn);
+    }
+    
+    function finalizarCompra() {
+        alert("Compra realizada com sucesso! Os e-books serão enviados para seu e-mail.");
+        cart = [];
+        atualizarCarrinho();
+    }
+    
+    function adicionarEbook() {
+        let titulo = prompt("Digite o título do e-book:");
+        let descricao = prompt("Digite a descrição do e-book:");
+        let tags = prompt("Digite as tags separadas por vírgula:").split(",");
+        let preco = parseFloat(prompt("Digite o preço do e-book:"));
+        let arquivo = prompt("Cole o link do arquivo PDF do e-book:");
+        if (titulo && descricao && tags.length > 0 && preco && arquivo.endsWith(".pdf")) {
+            let novoEbook = { id: ebooks.length + 1, title: titulo, description: descricao, tags: tags, price: preco, file: arquivo };
+            ebooks.push(novoEbook);
+            listarEbooks();
+        } else {
+            alert("Por favor, forneça um arquivo PDF válido e preencha todos os campos corretamente.");
+        }
+    }
+</script>
+
+</head>
+<body onload="verificarAcesso()">
+    <h1>Bem-vindo à Bigo-store</h1><div id="admin-section" class="admin">
+    <h2>Painel do Administrador</h2>
+    <p>Aqui você pode adicionar, remover e editar e-books.</p>
+    <button onclick="adicionarEbook()">Adicionar E-book</button>
+</div>
+
+<div id="comprador-section">
+    <h2>Loja de E-books</h2>
+    <p>Explore e compre os melhores e-books disponíveis.</p>
+    <div id="ebooks-list"></div>
+</div>
+
+<div id="cart" class="cart"></div>
+
+</body>
+</html>
